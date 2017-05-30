@@ -2,6 +2,10 @@
 
 experimental lean network manager<br/>
 So lean, it's not functional... yet, GET requests are partialy supported<br/>
+### Integrate
+```
+compile 'org.aviran.woodpecker:woodpecker:0.0.2'
+```
 
 <img src="http://i.imgur.com/35jFhoU.gif"/>
 
