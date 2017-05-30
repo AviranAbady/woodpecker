@@ -7,6 +7,7 @@ import android.util.Log;
 import org.aviran.woodpecker.Woodpecker;
 import org.aviran.woodpecker.WoodpeckerError;
 import org.aviran.woodpecker.WoodpeckerResponse;
+import org.aviran.woodpecker.WoodpeckerSettings;
 import org.aviran.woodpeckerapp.model.CharactersRequest;
 import org.aviran.woodpeckerapp.model.CharactersResponse;
 import org.aviran.woodpeckerapp.model.LoginRequest;
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Woodpecker.initialize(new WoodpeckerSettings("http://www.abady.org/woodpecker"));
 
         Woodpecker
                 .begin()

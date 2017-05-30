@@ -8,19 +8,31 @@ import java.util.List;
  */
 
 public class Woodpecker {
+
+    private static WoodpeckerSettings settings;
     // todo refactor
     public String getBaseURL() {
-        return "http://www.abady.org/woodpecker";
+        return Woodpecker.settings.getBaseURL();
+    }
+
+    public static void initialize(WoodpeckerSettings woodpeckerSettings) {
+        if(woodpeckerSettings.getBaseURL() == null) {
+            throw new WoodpeckerException("You must initialize woodpecker with a baseURL");
+        }
+        settings = woodpeckerSettings;
     }
 
     public static Woodpecker begin() {
+        if(settings == null) {
+            throw new WoodpeckerException("woodpecker is not initialized");
+        }
         return new Woodpecker();
     }
 
     private List<Peck> pecks;
     private WoodpeckerError errorHandler;
 
-    public Woodpecker() {
+    private Woodpecker() {
         pecks = new ArrayList<>();
     }
 
