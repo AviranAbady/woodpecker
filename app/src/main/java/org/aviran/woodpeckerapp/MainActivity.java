@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 .then(new WoodpeckerResponse<LoginResponse>() {
                     @Override
                     public void onSuccess(LoginResponse response) {
-                        Log.i("login", response.getToken());
+                        Log.i("WP", response.getToken());
+                        Woodpecker.getSettings().addHeader("token", response.getToken());
                     }
                 })
                 .request(new CharactersRequest(1, 10))
@@ -43,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
                 .error(new WoodpeckerError() {
 
                     @Override
-                    public void onError() {
-
+                    public void onError(WoodpeckerResponse response) {
+                        Log.e("WP", "ERROR");
                     }
                 });
     }

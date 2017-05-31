@@ -29,4 +29,8 @@ public class WoodpeckerSettings {
             headers.remove(name);
         }
     }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
 }

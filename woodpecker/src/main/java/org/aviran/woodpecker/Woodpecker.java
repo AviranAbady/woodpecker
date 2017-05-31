@@ -8,18 +8,24 @@ import java.util.List;
  */
 
 public class Woodpecker {
+    // Static
+    public static final String LOG_TAG = "Woodpecker";
 
     private static WoodpeckerSettings settings;
-    // todo refactor
-    public String getBaseURL() {
-        return Woodpecker.settings.getBaseURL();
-    }
 
     public static void initialize(WoodpeckerSettings woodpeckerSettings) {
         if(woodpeckerSettings.getBaseURL() == null) {
             throw new WoodpeckerException("You must initialize woodpecker with a baseURL");
         }
         settings = woodpeckerSettings;
+    }
+
+    public static WoodpeckerSettings getSettings() {
+        if(settings == null) {
+            throw new WoodpeckerException("woodpecker is not initialized");
+        }
+
+        return Woodpecker.settings;
     }
 
     public static Woodpecker begin() {
@@ -29,11 +35,17 @@ public class Woodpecker {
         return new Woodpecker();
     }
 
+    // Non static
+
     private List<Peck> pecks;
     private WoodpeckerError errorHandler;
 
     private Woodpecker() {
         pecks = new ArrayList<>();
+    }
+
+    public String getBaseURL() {
+        return Woodpecker.settings.getBaseURL();
     }
 
     public Woodpecker then(WoodpeckerResponse response) {
@@ -67,5 +79,11 @@ public class Woodpecker {
         }
 
         WoodpeckerNetwork.get(pecks.remove(0));
+    }
+
+    protected void handleError(WoodpeckerResponse response) {
+        if(errorHandler != null) {
+            errorHandler.onError(response);
+        }
     }
 }

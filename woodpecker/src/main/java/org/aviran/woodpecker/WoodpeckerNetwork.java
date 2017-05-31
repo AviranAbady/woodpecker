@@ -1,5 +1,7 @@
 package org.aviran.woodpecker;
 
+import android.os.AsyncTask;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -35,10 +37,10 @@ class WoodpeckerNetwork {
 
             @Override
             public void httpError() {
+                peck.getWoodpecker().handleError(peck.getResponse());
             }
         });
 
-        httpTask.execute();
+        httpTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
-
 }

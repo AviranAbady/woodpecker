@@ -5,5 +5,5 @@ package org.aviran.woodpecker;
  */
 
 public interface WoodpeckerError {
-    void onError();
+    void onError(WoodpeckerResponse response);
 }
