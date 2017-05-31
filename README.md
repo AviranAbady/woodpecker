@@ -1,7 +1,8 @@
 # woodpecker
 
 experimental lean network manager<br/>
-So lean, it's not functional... yet, GET requests are partialy supported<br/>
+So lean, it's not functional... yet.<br/>
+GET requests are partially supported.<br/>
 ### Integrate
 ```
 compile 'org.aviran.woodpecker:woodpecker:0.0.2'
