@@ -5,6 +5,6 @@ package org.aviran.woodpecker;
  */
 
 public interface WoodpeckerHttpResponse {
-    void success(String response);
-    void error();
+    void httpSuccess(String response);
+    void httpError();
 }

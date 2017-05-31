@@ -28,7 +28,7 @@ Woodpecker
             response.toString();
         }
     })
-    .error(new WoodpeckerError() {
+    .httpError(new WoodpeckerError() {
         @Override
         public void onError() {
 

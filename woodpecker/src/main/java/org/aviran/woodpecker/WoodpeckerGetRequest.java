@@ -32,7 +32,7 @@ public class WoodpeckerGetRequest extends AsyncTask<Void, Void, String> {
         } catch (MalformedURLException |
                 IllegalAccessException |
                 UnsupportedEncodingException  e) {
-            listener.error();
+            listener.httpError();
         }
     }
 
@@ -89,10 +89,10 @@ public class WoodpeckerGetRequest extends AsyncTask<Void, Void, String> {
 
     protected void onPostExecute(String response) {
         if (response == null) {
-            responseListener.error();
+            responseListener.httpError();
             return;
         }
-        responseListener.success(response);
+        responseListener.httpSuccess(response);
         peck.getWoodpecker().peck();
     }
 }

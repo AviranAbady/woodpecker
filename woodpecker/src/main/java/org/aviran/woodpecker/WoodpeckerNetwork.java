@@ -13,7 +13,7 @@ class WoodpeckerNetwork {
     public static <T> void get(final Peck peck) {
         WoodpeckerGetRequest httpTask = new WoodpeckerGetRequest(peck, new WoodpeckerHttpResponse() {
             @Override
-            public void success(String data) {
+            public void httpSuccess(String data) {
                 if (data == null) {
                     peck.getResponse().onError(new WoodpeckerException(""));
                 } else {
@@ -21,7 +21,6 @@ class WoodpeckerNetwork {
                     T t;
                     try {
                         Type type = response.getType();
-
                         if (type.equals(String.class)) {
                             response.onSuccess(data);
                         } else {
@@ -35,8 +34,7 @@ class WoodpeckerNetwork {
             }
 
             @Override
-            public void error() {
-//                dataResponse.onError(new WoodpeckerException(""));
+            public void httpError() {
             }
         });
 
