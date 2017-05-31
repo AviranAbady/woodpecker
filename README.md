@@ -1,6 +1,6 @@
 # woodpecker
 
-Experimental lean http client, aiming to provide a simple way to perform http request.<br/>
+Experimental lean http client, aiming to provide a simple way to perform http requests.<br/>
 So lean, it's not functional... yet.<br/>
 GET requests are partially supported.<br/>
 ### Integrate
