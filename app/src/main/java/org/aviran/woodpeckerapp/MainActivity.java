@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Woodpecker.initialize(new WoodpeckerSettings("http://www.abady.org/woodpecker"));
+        Woodpecker.initialize(new WoodpeckerSettings("http://woodpecker.aviran.org"));
 
         Woodpecker
                 .begin()
