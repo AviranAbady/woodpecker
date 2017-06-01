@@ -1,8 +1,10 @@
 # woodpecker
 
 Experimental lean http client, aiming to provide a simple way to perform http requests.<br/>
-So lean, it's not functional... yet.<br/>
-GET requests are partially supported.<br/>
+GET and POST requests are supported.<br/>
+<br/>
+See it in action, <a href="https://github.com/AviranAbady/woodpecker-demo">Android demo project</a>.
+
 ### Integrate
 ```
 compile 'org.aviran.woodpecker:woodpecker:0.0.3'
@@ -16,7 +18,7 @@ compile 'org.aviran.woodpecker:woodpecker:0.0.3'
 // Initialize Woodpecker
 Woodpecker.initialize(new WoodpeckerSettings("http://woodpecker.aviran.org"));
 
-// Run the following 4 request, one after the other.
+// Run the following 4 requests, consecutively, passing data from one to the other.
 
 // POST  login   /login?username=user&password=password
 // GET   list    /list?page=1&pageSize=10
@@ -52,7 +54,7 @@ Woodpecker
 .then(new WoodpeckerResponse<String>() {
     @Override
     public void onSuccess(String response) {
-        Log.i("WP", response.toString());
+        Log.i("WP", response);
     }
 })
 .error(new WoodpeckerError() {
