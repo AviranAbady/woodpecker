@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -18,22 +20,30 @@ import java.util.Map;
  * Created by Aviran Abady on 5/31/17.
  */
 
-public abstract class AbsHttpRequest extends AsyncTask<Void, Void, String> {
+abstract class HttpRequest extends AsyncTask<Void, Void, String> {
 
-    public abstract String performRequest();
+    public abstract String performRequest(HttpURLConnection url);
 
     protected final Peck peck;
     protected final WoodpeckerHttpResponse responseListener;
+    protected StringBuilder urlBuilder;
 
-    public AbsHttpRequest(Peck peck, WoodpeckerHttpResponse listener) {
+    public abstract String getRelativePath();
+
+    public HttpRequest(Peck peck, WoodpeckerHttpResponse listener) {
         this.peck = peck;
         this.responseListener = listener;
+        this.urlBuilder = new StringBuilder();
+        createURL(urlBuilder);
     }
 
+    private void createURL(StringBuilder url) {
+        url.append(peck.getWoodpecker().getBaseURL());
+        url.append(getRelativePath());
+    }
 
-
-    protected  String parseRequestParameters(WoodpeckerRequest request, StringBuilder url, boolean encode)
-            throws IllegalAccessException, UnsupportedEncodingException {
+    protected String parseRequestPayload(boolean encode) {
+        WoodpeckerRequest request = peck.getRequest();
         StringBuilder parameters = new StringBuilder();
         Field[] fields = request.getClass().getDeclaredFields();
         if(fields.length > 0) {
@@ -42,20 +52,31 @@ public abstract class AbsHttpRequest extends AsyncTask<Void, Void, String> {
                     parameters.append(field.getName());
                     parameters.append("=");
                     field.setAccessible(true);
-                    if(encode) {
-                        parameters.append(URLEncoder.encode(field.get(request).toString(), "utf-8"));
+                    try {
+                        if (encode) {
+                            parameters.append(URLEncoder.encode(field.get(request).toString(), "utf-8"));
+                        } else {
+                            parameters.append(field.get(request).toString());
+                        }
                     }
-                    else {
-                        parameters.append(field.get(request).toString());
+                    catch (IllegalAccessException e) {
+                        throw new WoodpeckerException("Could not access values from request");
+                    }
+                    catch (UnsupportedEncodingException e) {
+                        throw new WoodpeckerException("Could not encode parameters");
                     }
                     parameters.append("&");
                 }
                 else if(field.isAnnotationPresent(Path.class)) {
-                    //todo refactor to pattern/match
-                    field.setAccessible(true);
-                    String str = url.toString().replaceAll("\\{" + field.getName() + "\\}",field.get(request).toString());
-                    url.setLength(0);
-                    url.append(str);
+                    try {
+                        //todo refactor to pattern/match
+                        field.setAccessible(true);
+                        String str = urlBuilder.toString().replaceAll("\\{" + field.getName() + "\\}", field.get(request).toString());
+                        urlBuilder.setLength(0);
+                        urlBuilder.append(str);
+                    } catch (IllegalAccessException e) {
+                        throw new WoodpeckerException("Could not access values from request");
+                    }
                 }
             }
             if(parameters.length() > 0) {
@@ -65,9 +86,7 @@ public abstract class AbsHttpRequest extends AsyncTask<Void, Void, String> {
         return parameters.toString();
     }
 
-    protected String doInBackground(Void... v) {
-        return performRequest();
-    }
+
 
     protected String readInputSteam(InputStream inputStream) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -98,6 +117,22 @@ public abstract class AbsHttpRequest extends AsyncTask<Void, Void, String> {
 
         for (Map.Entry<String, String> header : headers.entrySet()) {
             httpConnection.addRequestProperty(header.getKey(), header.getValue());
+        }
+    }
+
+    // AsyncTask calls
+
+    protected String doInBackground(Void... v) {
+        URL url;
+        HttpURLConnection connection;
+        try {
+            url = new URL(urlBuilder.toString());
+            connection = (HttpURLConnection) url.openConnection();
+            return performRequest(connection);
+        } catch (MalformedURLException e) {
+            throw new WoodpeckerException("Malformed URL - " + urlBuilder.toString());
+        } catch (IOException e) {
+            throw new WoodpeckerException("Could not open connection");
         }
     }
 

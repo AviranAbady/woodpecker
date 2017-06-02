@@ -9,7 +9,6 @@ public class WoodpeckerException extends RuntimeException{
     private String data;
 
     public WoodpeckerException(String data, Exception exception) {
-        super();
         this.exception = exception;
         this.data = data;
     }

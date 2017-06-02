@@ -13,14 +13,14 @@ public class Woodpecker {
     private static WoodpeckerSettings settings;
 
     public static void initialize(WoodpeckerSettings woodpeckerSettings) {
-        if(woodpeckerSettings.getBaseURL() == null) {
+        if (woodpeckerSettings.getBaseURL() == null) {
             throw new WoodpeckerException("You must initialize woodpecker with a baseURL");
         }
         settings = woodpeckerSettings;
     }
 
     public static WoodpeckerSettings getSettings() {
-        if(settings == null) {
+        if (settings == null) {
             throw new WoodpeckerException("woodpecker is not initialized");
         }
 
@@ -28,7 +28,7 @@ public class Woodpecker {
     }
 
     public static Woodpecker begin() {
-        if(settings == null) {
+        if (settings == null) {
             throw new WoodpeckerException("woodpecker is not initialized");
         }
         return new Woodpecker();
@@ -52,14 +52,14 @@ public class Woodpecker {
     }
 
     public Woodpecker then(WoodpeckerResponse response) {
-        if(pecks.size() == 0) {
+        if (pecks.size() == 0) {
             throw new WoodpeckerException("There is no request to add a response for");
         }
 
 
         response.setRequestsList(requests);
         Peck lastPeck = pecks.get(pecks.size() - 1);
-        if(lastPeck.getResponse() != null) {
+        if (lastPeck.getResponse() != null) {
             throw new WoodpeckerException("Request already has a response");
         }
 
@@ -70,7 +70,7 @@ public class Woodpecker {
 
     public Woodpecker request(WoodpeckerRequest request) {
         request.setRequestId(requestsCount++);
-        pecks.add(new Peck(request,this));
+        pecks.add(new Peck(request, this));
         requests.add(request);
         return this;
     }
@@ -82,21 +82,27 @@ public class Woodpecker {
     }
 
     protected void peck() {
-        if(pecks.size() == 0) {
+        if (pecks.size() == 0) {
             return;
         }
 
         Peck peck = pecks.remove(0);
-        if(peck.getType() == RequestType.GET) {
-            WoodpeckerNetwork.get(peck);
-        }
-        else {
-            WoodpeckerNetwork.post(peck);
+        switch (peck.getType()) {
+            case GET:
+                WoodpeckerNetwork.get(peck);
+                return;
+            case POST:
+                WoodpeckerNetwork.post(peck);
+                return;
+            case HEAD:
+                WoodpeckerNetwork.head(peck);
+            default:
+                return;
         }
     }
 
     protected void handleError(WoodpeckerResponse response) {
-        if(errorHandler != null) {
+        if (errorHandler != null) {
             errorHandler.onError(response);
         }
     }

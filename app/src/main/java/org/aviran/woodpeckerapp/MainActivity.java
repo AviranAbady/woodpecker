@@ -4,11 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.aviran.woodpecker.DefaultHeadResponse;
 import org.aviran.woodpecker.Woodpecker;
 import org.aviran.woodpecker.WoodpeckerError;
 import org.aviran.woodpecker.WoodpeckerRequest;
 import org.aviran.woodpecker.WoodpeckerResponse;
 import org.aviran.woodpecker.WoodpeckerSettings;
+import org.aviran.woodpeckerapp.model.HeadRequest;
 import org.aviran.woodpeckerapp.model.ItemRequest;
 import org.aviran.woodpeckerapp.model.ListRequest;
 import org.aviran.woodpeckerapp.model.ItemResponse;
@@ -34,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
 
         Woodpecker
                 .begin()
+                .request(new HeadRequest())
+                .then(new WoodpeckerResponse<Void>() {
+                    @Override
+                    public void onSuccess(Void response) {
+                        this.getHeaders();
+                    }
+                })
                 .request(new LoginRequest("aviran", "12345"))
                 .then(new WoodpeckerResponse<LoginResponse>() {
                     @Override
@@ -60,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 .then(new WoodpeckerResponse<String>() {
                     @Override
                     public void onSuccess(String response) {
-                        Log.i("WP", response.toString());
+                        Log.i("WP", response);
                     }
                 })
                 .error(new WoodpeckerError() {

@@ -3,6 +3,7 @@ package org.aviran.woodpecker;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Aviran Abady on 5/26/17.
@@ -13,6 +14,7 @@ public abstract class WoodpeckerResponse<T> {
     private String rawResponse;
     private int requestId;
     private List<WoodpeckerRequest> requests;
+    private Map<String, List<String>> headers;
 
     public abstract void onSuccess(T response);
 
@@ -63,5 +65,13 @@ public abstract class WoodpeckerResponse<T> {
         }
 
         return requests.get(position);
+    }
+
+    public void setHeaders(Map<String, List<String>> headers) {
+        this.headers = headers;
+    }
+
+    public Map<String, List<String>> getHeaders() {
+        return headers;
     }
 }

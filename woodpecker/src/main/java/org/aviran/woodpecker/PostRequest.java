@@ -16,38 +16,15 @@ import java.net.URL;
  * Created by Aviran Abady on 5/31/17.
  */
 
-public class PostRequest extends AbsHttpRequest {
-    private URL url;
+class PostRequest extends HttpRequest {
     private String body;
-
     public PostRequest(Peck peck, WoodpeckerHttpResponse listener) {
         super(peck, listener);
-
-        try {
-            url = createURL(peck.getRequest());
-        } catch (MalformedURLException e) {
-            listener.httpError();
-        }
+        body = requestBody();
     }
 
-    protected URL createURL(WoodpeckerRequest request) throws MalformedURLException {
-        Post requestAnnotation = request.getClass().getAnnotation(Post.class);
-        StringBuilder url = new StringBuilder();
-        url.append(peck.getWoodpecker().getBaseURL());
-        url.append(requestAnnotation.value());
-        body = requestBody(url);
-
-        return new URL(url.toString());
-    }
-
-    private String requestBody(StringBuilder url) {
-        WoodpeckerRequest request = peck.getRequest();
-        String parameters;
-        try {
-            parameters = parseRequestParameters(request, url, false);
-        } catch (UnsupportedEncodingException | IllegalAccessException e) {
-            throw new WoodpeckerException("");
-        }
+    private String requestBody() {
+        String parameters = parseRequestPayload(false);
 
         if (parameters.length() > 0) {
             return parameters;
@@ -57,11 +34,8 @@ public class PostRequest extends AbsHttpRequest {
     }
 
     @Override
-    public String performRequest() {
-        HttpURLConnection httpConnection = null;
+    public String performRequest(HttpURLConnection httpConnection) {
         try {
-
-            httpConnection = (HttpURLConnection) url.openConnection();
             httpConnection.setRequestMethod("POST");
             addHeaders(httpConnection);
             httpConnection.setDoInput(true);
@@ -75,21 +49,24 @@ public class PostRequest extends AbsHttpRequest {
 
             String response = readInputSteam(httpConnection.getInputStream());
             httpConnection.getInputStream().close();
-            httpConnection.disconnect();
             peck.getResponse().setRawResponse(response);
             peck.getResponse().setResponseCode(httpConnection.getResponseCode());
+            peck.getResponse().setHeaders(httpConnection.getHeaderFields());
             return response;
-        } catch (MalformedURLException e) {
-            return null;
-        } catch (ProtocolException e) {
-            return null;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             generateErrorResponse(peck.getResponse(), httpConnection);
             return null;
         }
         finally {
-//            httpConnection.getInputStream().close();
-//            httpConnection.disconnect();
+            httpConnection.disconnect();
         }
+    }
+
+    @Override
+    public String getRelativePath() {
+        Post requestAnnotation = peck.getRequest().getClass().getAnnotation(Post.class);
+        return requestAnnotation.value();
+
     }
 }

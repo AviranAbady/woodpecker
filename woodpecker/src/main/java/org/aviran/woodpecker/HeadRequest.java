@@ -1,6 +1,7 @@
 package org.aviran.woodpecker;
 
-import org.aviran.woodpecker.annotations.Get;
+import org.aviran.woodpecker.annotations.Head;
+import org.aviran.woodpecker.annotations.Post;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -9,14 +10,12 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 /**
- * Created by Aviran Abady on 5/26/17.
+ * Created by Aviran Abady on 6/2/17.
  */
 
-class GetRequest extends HttpRequest {
+class HeadRequest extends HttpRequest {
 
-    protected URL _url;
-
-    public GetRequest(Peck peck, WoodpeckerHttpResponse listener) {
+    public HeadRequest(Peck peck, WoodpeckerHttpResponse listener) {
         super(peck, listener);
         String parameters = parseRequestPayload(true);
         if(parameters.length() > 0) {
@@ -26,14 +25,11 @@ class GetRequest extends HttpRequest {
 
     public String performRequest(HttpURLConnection httpConnection) {
         try {
-            httpConnection.setRequestMethod("GET");
+            httpConnection.setRequestMethod("HEAD");
             addHeaders(httpConnection);
-            String response = readInputSteam(httpConnection.getInputStream());
-            httpConnection.getInputStream().close();
-            peck.getResponse().setRawResponse(response);
             peck.getResponse().setResponseCode(httpConnection.getResponseCode());
             peck.getResponse().setHeaders(httpConnection.getHeaderFields());
-            return response;
+            return "";
         } catch (IOException e) {
             generateErrorResponse(peck.getResponse(), httpConnection);
             return null;
@@ -41,12 +37,12 @@ class GetRequest extends HttpRequest {
         finally {
             httpConnection.disconnect();
         }
-
     }
 
     @Override
     public String getRelativePath() {
-        Get requestAnnotation = peck.getRequest().getClass().getAnnotation(Get.class);
+        Head requestAnnotation = peck.getRequest().getClass().getAnnotation(Head.class);
         return requestAnnotation.value();
+
     }
 }

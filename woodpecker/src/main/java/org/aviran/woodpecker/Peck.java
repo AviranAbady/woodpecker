@@ -1,6 +1,7 @@
 package org.aviran.woodpecker;
 
 import org.aviran.woodpecker.annotations.Get;
+import org.aviran.woodpecker.annotations.Head;
 import org.aviran.woodpecker.annotations.Post;
 
 import java.lang.annotation.Annotation;
@@ -22,6 +23,7 @@ class Peck {
     }
 
     private RequestType setType() {
+        // todo refactor to []getAnnotations()
         Annotation annotation = request.getClass().getAnnotation(Get.class);
         if(annotation != null) {
             return RequestType.GET;
@@ -30,6 +32,11 @@ class Peck {
         annotation = request.getClass().getAnnotation(Post.class);
         if(annotation != null) {
             return RequestType.POST;
+        }
+
+        annotation = request.getClass().getAnnotation(Head.class);
+        if(annotation != null) {
+            return RequestType.HEAD;
         }
 
         throw new WoodpeckerException("Request is not annotation for request type");

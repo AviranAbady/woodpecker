@@ -44,6 +44,26 @@ class WoodpeckerNetwork {
         httpTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    public static <T> void head(final Peck peck) {
+        HeadRequest httpTask = new HeadRequest(peck, new WoodpeckerHttpResponse() {
+            @Override
+            public void httpSuccess(String data) {
+                if (data == null) {
+                    peck.getResponse().onError(new WoodpeckerException(""));
+                } else {
+                    peck.getResponse().onSuccess(null);
+                }
+            }
+
+            @Override
+            public void httpError() {
+                peck.getWoodpecker().handleError(peck.getResponse());
+            }
+        });
+
+        httpTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
 
     public static <T> void post(final Peck peck) {
         PostRequest httpTask = new PostRequest(peck, new WoodpeckerHttpResponse() {
