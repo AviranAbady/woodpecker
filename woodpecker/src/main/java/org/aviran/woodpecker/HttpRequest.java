@@ -40,6 +40,25 @@ abstract class HttpRequest extends AsyncTask<Void, Void, String> {
     private void createURL(StringBuilder url) {
         url.append(peck.getWoodpecker().getBaseURL());
         url.append(getRelativePath());
+
+        Field[] fields = peck.getRequest().getClass().getDeclaredFields();
+        if(fields == null || fields.length == 0) {
+            return;
+        }
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Path.class)) {
+                try {
+                    //todo refactor to pattern/match
+                    field.setAccessible(true);
+                    String str = urlBuilder.toString().replaceAll("\\{" + field.getName() + "\\}", field.get(peck.getRequest()).toString());
+                    urlBuilder.setLength(0);
+                    urlBuilder.append(str);
+                } catch (IllegalAccessException e) {
+                    throw new WoodpeckerException("Could not access values from request");
+                }
+            }
+        }
     }
 
     protected String parseRequestPayload(boolean encode) {
@@ -66,17 +85,6 @@ abstract class HttpRequest extends AsyncTask<Void, Void, String> {
                         throw new WoodpeckerException("Could not encode parameters");
                     }
                     parameters.append("&");
-                }
-                else if(field.isAnnotationPresent(Path.class)) {
-                    try {
-                        //todo refactor to pattern/match
-                        field.setAccessible(true);
-                        String str = urlBuilder.toString().replaceAll("\\{" + field.getName() + "\\}", field.get(request).toString());
-                        urlBuilder.setLength(0);
-                        urlBuilder.append(str);
-                    } catch (IllegalAccessException e) {
-                        throw new WoodpeckerException("Could not access values from request");
-                    }
                 }
             }
             if(parameters.length() > 0) {

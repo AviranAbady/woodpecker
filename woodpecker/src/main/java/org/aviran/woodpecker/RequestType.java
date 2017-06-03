@@ -7,5 +7,6 @@ package org.aviran.woodpecker;
 enum RequestType {
     GET,
     HEAD,
+    PUT,
     POST
 }

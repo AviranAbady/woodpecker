@@ -18,12 +18,14 @@ compile 'org.aviran.woodpecker:woodpecker:0.0.3'
 // Initialize Woodpecker
 Woodpecker.initialize(new WoodpeckerSettings("http://woodpecker.aviran.org"));
 
-// Run the following 4 requests, consecutively, passing data from one to the other.
+// Run the following 6 requests, consecutively, passing data from one to the other.
 
-// POST  login   /login?username=user&password=password
-// GET   list    /list?page=1&pageSize=10
-// GET   item    /item/{id}
-// POST  review  { itemId: id, name: Aviran, review: This is awesome }
+// POST  login    /login - post body: username=user&password=password
+// GET   list     /list?page=1&pageSize=10
+// GET   item     /item/{id}
+// POST  review   /review - post body: { name: Aviran, review: This is awesome }
+// GET   get      /image.png - download binary file
+// PUT   upload   /upload - upload binary image file
 
 
 Woodpecker

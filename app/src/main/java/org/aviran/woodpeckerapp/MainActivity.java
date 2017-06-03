@@ -4,10 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import org.aviran.woodpecker.DefaultHeadResponse;
 import org.aviran.woodpecker.Woodpecker;
 import org.aviran.woodpecker.WoodpeckerError;
-import org.aviran.woodpecker.WoodpeckerRequest;
 import org.aviran.woodpecker.WoodpeckerResponse;
 import org.aviran.woodpecker.WoodpeckerSettings;
 import org.aviran.woodpeckerapp.model.HeadRequest;
@@ -17,6 +15,7 @@ import org.aviran.woodpeckerapp.model.ItemResponse;
 import org.aviran.woodpeckerapp.model.LoginRequest;
 import org.aviran.woodpeckerapp.model.LoginResponse;
 import org.aviran.woodpeckerapp.model.ReviewRequest;
+import org.aviran.woodpeckerapp.model.UploadRequest;
 
 import java.util.List;
 
@@ -70,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(String response) {
                         Log.i("WP", response);
+                    }
+                })
+                .request(new UploadRequest())
+                .then(new WoodpeckerResponse<String>() {
+                    @Override
+                    public void onSuccess(String response) {
+
                     }
                 })
                 .error(new WoodpeckerError() {

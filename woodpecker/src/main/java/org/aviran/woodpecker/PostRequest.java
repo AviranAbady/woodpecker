@@ -6,6 +6,7 @@ import org.aviran.woodpecker.annotations.Post;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -17,17 +18,23 @@ import java.net.URL;
  */
 
 class PostRequest extends HttpRequest {
+    private String requestMethod = "POST";
     private String body;
+
     public PostRequest(Peck peck, WoodpeckerHttpResponse listener) {
         super(peck, listener);
-        body = requestBody();
+        if (!peck.isRequestMultipart()) {
+            body = requestBody();
+        }
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        this.requestMethod = requestMethod;
     }
 
     private String requestBody() {
-        String parameters = parseRequestPayload(false);
-
-        if (parameters.length() > 0) {
-            return parameters;
+        if (peck.isRequestWithParameters()) {
+            return parseRequestPayload(false);
         } else {
             return new Gson().toJson(peck.getRequest());
         }
@@ -36,12 +43,14 @@ class PostRequest extends HttpRequest {
     @Override
     public String performRequest(HttpURLConnection httpConnection) {
         try {
-            httpConnection.setRequestMethod("POST");
+            httpConnection.setRequestMethod(requestMethod);
             addHeaders(httpConnection);
             httpConnection.setDoInput(true);
             httpConnection.setDoOutput(true);
 
-            if(body != null) {
+            if (peck.isRequestMultipart()) {
+                writeMultipartData(httpConnection.getOutputStream());
+            } else if (body != null) {
                 DataOutputStream dataOutputStream = new DataOutputStream(httpConnection.getOutputStream());
                 dataOutputStream.write(body.getBytes());
                 dataOutputStream.close();
@@ -53,20 +62,26 @@ class PostRequest extends HttpRequest {
             peck.getResponse().setResponseCode(httpConnection.getResponseCode());
             peck.getResponse().setHeaders(httpConnection.getHeaderFields());
             return response;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             generateErrorResponse(peck.getResponse(), httpConnection);
             return null;
-        }
-        finally {
+        } finally {
             httpConnection.disconnect();
         }
+    }
+
+    private void writeMultipartData(OutputStream outputStream) {
+        String separator = "-----------------------------" + getRandomNumber();
+        String content = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n\r\n";
+    }
+
+    private String getRandomNumber() {
+        return String.valueOf(System.currentTimeMillis());
     }
 
     @Override
     public String getRelativePath() {
         Post requestAnnotation = peck.getRequest().getClass().getAnnotation(Post.class);
         return requestAnnotation.value();
-
     }
 }
