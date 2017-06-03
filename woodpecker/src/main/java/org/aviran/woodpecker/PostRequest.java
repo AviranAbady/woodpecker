@@ -1,17 +1,11 @@
 package org.aviran.woodpecker;
 
 import com.google.gson.Gson;
-
-import org.aviran.woodpecker.annotations.Post;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import org.aviran.woodpecker.annotations.Post;
 
 /**
  * Created by Aviran Abady on 5/31/17.
@@ -73,6 +67,10 @@ class PostRequest extends HttpRequest {
     private void writeMultipartData(OutputStream outputStream) {
         String separator = "-----------------------------" + getRandomNumber();
         String content = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n\r\n";
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+
+
+//        dataOutputStream.write();
     }
 
     private String getRandomNumber() {
