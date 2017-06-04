@@ -1,10 +1,17 @@
 package org.aviran.woodpecker;
 
 import com.google.gson.Gson;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+
+import org.aviran.woodpecker.annotations.File;
+import org.aviran.woodpecker.annotations.Param;
 import org.aviran.woodpecker.annotations.Post;
 
 /**
@@ -59,18 +66,49 @@ class PostRequest extends HttpRequest {
         } catch (IOException e) {
             generateErrorResponse(peck.getResponse(), httpConnection);
             return null;
+        } catch (IllegalAccessException e) {
+            return null;
         } finally {
             httpConnection.disconnect();
         }
     }
 
-    private void writeMultipartData(OutputStream outputStream) {
+    private void writeMultipartData(OutputStream outputStream) throws IOException, IllegalAccessException {
+        WoodpeckerRequest request = peck.getRequest();
         String separator = "-----------------------------" + getRandomNumber();
-        String content = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n\r\n";
+        String contentFile = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n\r\n";
+        String contentParam = "Content-Disposition: form-data; name=\"%s\";\r\n\r\n";
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 
+        Field[] fields = peck.getRequest().getClass().getDeclaredFields();
+        if (fields == null || fields.length == 0) {
+            return;
+        }
 
-//        dataOutputStream.write();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Param.class)) {
+                dataOutputStream.writeBytes(separator);
+                dataOutputStream.writeBytes(String.format(contentParam, field.getName()));
+                dataOutputStream.writeBytes(field.get(request).toString() + "\r\n");
+                dataOutputStream.writeBytes(separator);
+
+            } else if (field.isAnnotationPresent(File.class)) {
+                WoodpeckerFileStream file = (WoodpeckerFileStream) field.get(request);
+                dataOutputStream.writeBytes(separator);
+                dataOutputStream.writeBytes(String.format(contentFile, field.getName()));
+
+                int bytesRead = 0;
+                byte[] buffer = new byte[1024];
+                InputStream stream = file.getStream();
+                while ((bytesRead = stream.read(buffer)) != -1) {
+                    dataOutputStream.write(buffer, 0, bytesRead);
+                }
+                dataOutputStream.writeBytes(separator);
+            }
+        }
+        dataOutputStream.writeBytes("--");
+
+
     }
 
     private String getRandomNumber() {
