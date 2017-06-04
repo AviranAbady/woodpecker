@@ -30,8 +30,6 @@ class Peck {
     }
 
     private RequestType setType() {
-        // todo refactor to []getAnnotations()
-
         Annotation[] annotations = request.getClass().getDeclaredAnnotations();
         if(annotations.length != 1) {
             throw new WoodpeckerException("Request class should have only one annotation");

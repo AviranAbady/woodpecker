@@ -5,7 +5,7 @@ package org.aviran.woodpecker;
  */
 
 public abstract class WoodpeckerRequest {
-    int requestId;
+    private int requestId;
 
     protected void setRequestId(int requestId) {
         this.requestId = requestId;

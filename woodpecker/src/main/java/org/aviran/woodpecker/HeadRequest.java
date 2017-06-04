@@ -1,13 +1,8 @@
 package org.aviran.woodpecker;
 
-import org.aviran.woodpecker.annotations.Head;
-import org.aviran.woodpecker.annotations.Post;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import org.aviran.woodpecker.annotations.Head;
 
 /**
  * Created by Aviran Abady on 6/2/17.

@@ -89,7 +89,6 @@ class PostRequest extends HttpRequest {
         final String contentFile = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n";
         final String contentParam = "Content-Disposition: form-data; name=\"%s\";\r\n\r\n";
         final String crlf = "\r\n";
-        ;
 
         Field[] fields = peck.getRequest().getClass().getDeclaredFields();
         if (fields == null || fields.length == 0) {

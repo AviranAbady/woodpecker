@@ -41,7 +41,6 @@ class GetRequest extends HttpRequest {
         finally {
             httpConnection.disconnect();
         }
-
     }
 
     @Override

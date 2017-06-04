@@ -94,8 +94,6 @@ abstract class HttpRequest extends AsyncTask<Void, Void, String> {
         return parameters.toString();
     }
 
-
-
     protected String readInputSteam(InputStream inputStream) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(inputStream);
@@ -128,7 +126,7 @@ abstract class HttpRequest extends AsyncTask<Void, Void, String> {
         }
     }
 
-    // AsyncTask calls
+    // AsyncTask's calls
 
     protected String doInBackground(Void... v) {
         URL url;
