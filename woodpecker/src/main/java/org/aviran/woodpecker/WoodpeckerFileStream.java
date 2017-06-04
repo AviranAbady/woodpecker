@@ -9,12 +9,10 @@ import java.io.InputStream;
 public class WoodpeckerFileStream {
     private String fileName;
     private InputStream stream;
-    private String mimeType;
 
-    public WoodpeckerFileStream(String fileName, InputStream stream, String mimeType) {
+    public WoodpeckerFileStream(String fileName, InputStream stream) {
         this.fileName = fileName;
         this.stream = stream;
-        this.mimeType = mimeType;
     }
 
     public String getFileName() {
@@ -23,9 +21,5 @@ public class WoodpeckerFileStream {
 
     public InputStream getStream() {
         return stream;
-    }
-
-    public String getMimeType() {
-        return mimeType;
     }
 }

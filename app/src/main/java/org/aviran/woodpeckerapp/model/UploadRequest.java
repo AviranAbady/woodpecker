@@ -16,6 +16,10 @@ public class UploadRequest extends WoodpeckerRequest {
     private String uploadToken;
 
     @File
-    private WoodpeckerFileStream file;
+    private WoodpeckerFileStream fileUpload;
 
+    public UploadRequest(String uploadToken, WoodpeckerFileStream fileUpload) {
+        this.uploadToken = uploadToken;
+        this.fileUpload = fileUpload;
+    }
 }

@@ -5,10 +5,10 @@ import com.google.gson.Gson;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.net.URLConnection;
 
 import org.aviran.woodpecker.annotations.File;
 import org.aviran.woodpecker.annotations.Param;
@@ -21,6 +21,7 @@ import org.aviran.woodpecker.annotations.Post;
 class PostRequest extends HttpRequest {
     private String requestMethod = "POST";
     private String body;
+    private String multipartSeparator;
 
     public PostRequest(Peck peck, WoodpeckerHttpResponse listener) {
         super(peck, listener);
@@ -38,6 +39,16 @@ class PostRequest extends HttpRequest {
             return parseRequestPayload(false);
         } else {
             return new Gson().toJson(peck.getRequest());
+        }
+    }
+
+    @Override
+    public void addHeaders(HttpURLConnection httpURLConnection) {
+        super.addHeaders(httpURLConnection);
+
+        if (peck.isRequestMultipart()) {
+            multipartSeparator = "-----------------------------" + getRandomNumber();
+            httpURLConnection.addRequestProperty("Content-Type", "multipart/form-data; boundary=" + multipartSeparator);
         }
     }
 
@@ -75,27 +86,34 @@ class PostRequest extends HttpRequest {
 
     private void writeMultipartData(OutputStream outputStream) throws IOException, IllegalAccessException {
         WoodpeckerRequest request = peck.getRequest();
-        String separator = "-----------------------------" + getRandomNumber();
-        String contentFile = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n\r\n";
-        String contentParam = "Content-Disposition: form-data; name=\"%s\";\r\n\r\n";
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+        final String contentFile = "Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n";
+        final String contentParam = "Content-Disposition: form-data; name=\"%s\";\r\n\r\n";
+        final String crlf = "\r\n";
+        ;
 
         Field[] fields = peck.getRequest().getClass().getDeclaredFields();
         if (fields == null || fields.length == 0) {
             return;
         }
 
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+
         for (Field field : fields) {
+            field.setAccessible(true);
             if (field.isAnnotationPresent(Param.class)) {
-                dataOutputStream.writeBytes(separator);
+                dataOutputStream.writeBytes("--" + multipartSeparator);
+                dataOutputStream.writeBytes(crlf);
                 dataOutputStream.writeBytes(String.format(contentParam, field.getName()));
-                dataOutputStream.writeBytes(field.get(request).toString() + "\r\n");
-                dataOutputStream.writeBytes(separator);
+                dataOutputStream.writeBytes(field.get(request).toString());
+                dataOutputStream.writeBytes(crlf);
 
             } else if (field.isAnnotationPresent(File.class)) {
                 WoodpeckerFileStream file = (WoodpeckerFileStream) field.get(request);
-                dataOutputStream.writeBytes(separator);
-                dataOutputStream.writeBytes(String.format(contentFile, field.getName()));
+                dataOutputStream.writeBytes("--" + multipartSeparator);
+                dataOutputStream.writeBytes(crlf);
+                dataOutputStream.writeBytes(String.format(contentFile, field.getName(), file.getFileName()));
+                dataOutputStream.writeBytes("Content-Transfer-Encoding: binary\r\n");
+                dataOutputStream.writeBytes("Content-Type: "+ guessMimeType(file.getFileName()) +"\r\n\r\n");
 
                 int bytesRead = 0;
                 byte[] buffer = new byte[1024];
@@ -103,13 +121,22 @@ class PostRequest extends HttpRequest {
                 while ((bytesRead = stream.read(buffer)) != -1) {
                     dataOutputStream.write(buffer, 0, bytesRead);
                 }
-                dataOutputStream.writeBytes(separator);
+                dataOutputStream.writeBytes(crlf);
                 stream.close();
             }
         }
+        dataOutputStream.writeBytes("--" + multipartSeparator);
         dataOutputStream.writeBytes("--");
-
+        dataOutputStream.writeBytes(crlf);
         dataOutputStream.close();
+    }
+
+    private String guessMimeType(String fileName) {
+        String guess = URLConnection.guessContentTypeFromName(fileName);
+        if(guess == null) {
+            return "application/octet-stream";
+        }
+        return guess;
     }
 
     private String getRandomNumber() {

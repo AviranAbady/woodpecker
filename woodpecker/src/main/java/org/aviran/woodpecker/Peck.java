@@ -56,7 +56,7 @@ class Peck {
     }
 
     private void scanRequestFields() {
-        Field[] fields = request.getClass().getFields();
+        Field[] fields = request.getClass().getDeclaredFields();
         if(fields == null || fields.length == 0) {
             return;
         }

@@ -1,11 +1,15 @@
 package org.aviran.woodpeckerapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
 import org.aviran.woodpecker.Woodpecker;
 import org.aviran.woodpecker.WoodpeckerError;
+import org.aviran.woodpecker.WoodpeckerFileStream;
 import org.aviran.woodpecker.WoodpeckerResponse;
 import org.aviran.woodpecker.WoodpeckerSettings;
 import org.aviran.woodpeckerapp.model.HeadRequest;
@@ -17,6 +21,9 @@ import org.aviran.woodpeckerapp.model.LoginResponse;
 import org.aviran.woodpeckerapp.model.ReviewRequest;
 import org.aviran.woodpeckerapp.model.UploadRequest;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -71,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("WP", response);
                     }
                 })
-                .request(new UploadRequest())
+                .request(new UploadRequest("123", getFileUploadStream()))
                 .then(new WoodpeckerResponse<String>() {
                     @Override
                     public void onSuccess(String response) {
@@ -84,5 +91,10 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("WP", "ERROR");
                     }
                 });
+    }
+
+    public WoodpeckerFileStream getFileUploadStream() {
+        InputStream inputStream = getResources().openRawResource(R.raw.image);
+        return new WoodpeckerFileStream("fileName", inputStream);
     }
 }
