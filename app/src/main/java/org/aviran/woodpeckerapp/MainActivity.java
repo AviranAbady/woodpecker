@@ -42,13 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
         Woodpecker
                 .begin()
-                .request(new HeadRequest())
-                .then(new WoodpeckerResponse<Void>() {
-                    @Override
-                    public void onSuccess(Void response) {
-                        this.getHeaders();
-                    }
-                })
                 .request(new LoginRequest("aviran", "12345"))
                 .then(new WoodpeckerResponse<LoginResponse>() {
                     @Override
@@ -95,6 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     public WoodpeckerFileStream getFileUploadStream() {
         InputStream inputStream = getResources().openRawResource(R.raw.image);
-        return new WoodpeckerFileStream("fileName", inputStream);
+        return new WoodpeckerFileStream("image.png", inputStream);
     }
 }
