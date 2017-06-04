@@ -104,11 +104,12 @@ class PostRequest extends HttpRequest {
                     dataOutputStream.write(buffer, 0, bytesRead);
                 }
                 dataOutputStream.writeBytes(separator);
+                stream.close();
             }
         }
         dataOutputStream.writeBytes("--");
 
-
+        dataOutputStream.close();
     }
 
     private String getRandomNumber() {
