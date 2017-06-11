@@ -1,12 +1,11 @@
 # woodpecker
 
 Lean HTTP client for Android.<br/>
-Aiming to provide a simplicity when performing http requests, simplifying requests chaining.<br/>
+Aiming to provide simplicity, minimal setup, chain requests without nesting code blocks.<br/>
 GET, POST, PUT, HEAD requests are supported.<br/>
 Upstream/Downstream progress listeners are available for upload/download progress tracking.<br/>
 <br/>
 See it in action, <a href="https://github.com/AviranAbady/woodpecker-demo">Android demo project</a>.
-
 
 ### Integrate
 ```gradle
@@ -16,7 +15,11 @@ compile 'org.aviran.woodpecker:woodpecker:0.9.1'
 <img src="http://i.imgur.com/35jFhoU.gif"/>
 
 
-### Easily perform HTTP api calls, chain api calls easily.
+### Over the top proof of concept
+The following scenario fires 6 http requests in a row, passing data from one to the other when
+ necessary.<br/>
+ Quick initialization, build the request chain without nesting them inside each other's
+ response callbacks.<br/>
 ```java
 // Initialize Woodpecker
 Woodpecker.initialize(new WoodpeckerSettings("http://woodpecker.aviran.org"));
@@ -153,7 +156,7 @@ progressListener = new WoodpeckerProgressListener() {
     }
 }
 
-// By use the @Progress annotation, this request will invoke progress
+// By using the @Progress annotation, this request will invoke progress
 // notification calls to the supplied listener
 @Get("/woodpecker.jpg")
 public class DownloadFileRequest extends WoodpeckerRequest {
